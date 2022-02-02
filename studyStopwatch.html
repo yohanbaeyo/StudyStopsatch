@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>스터디 스톱워치</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="studyStopwatch.css">
+    <script type="text/javascript" src="studyStopwatch.js"></script>
+    <script>
+
+/*
+        window.onkeydown = () => {
+            if (event.keyCode === 116) {
+                event.keyCode= 2;
+                return false;
+            } else if(event.ctrlKey && event.keyCode === 82 ) {
+                return false;
+            }
+        }
+*/
+        // window.onbeforeunload = ()=>{return "창을 닫으시겠습니까?";};
+    </script>
+</head>
+<body>
+    <div class="stop-watch">
+        <div class="pausing-stopwatch change-when-paused"></div>
+        <div class="stopwatch-title-container">
+            <span id="time-indicator" class="change-when-paused">00:00:00.0</span>
+        </div>
+        <button id="stop-pause" class="button change-when-paused" onclick="stopwatchController.toggleStopwatch(event)"><icon-tag size="24" type="play_arrow"></icon-tag></button>
+        <button id="reset" class="button change-when-paused" onclick="stopwatchController.resetStopwatch()"><icon-tag size="24" type="replay"></icon-tag></button>
+        <button id="record-download" class="button change-when-paused" onclick="stopwatchController.recordOrDownload()" ><icon-tag size="24" type="download"></icon-tag></button>
+    </div>
+<!--TODO : 경고창 자동 accept 체크박스-->
+</body>
+<style>
+    .material-icons {
+        font-family: 'Material Icons';
+        font-weight: normal;
+        font-style: normal;
+        font-size: 24px;  /* Preferred icon size */
+        display: inline-block;
+        line-height: 1;
+        text-transform: none;
+        letter-spacing: normal;
+        word-wrap: normal;
+        white-space: nowrap;
+        direction: ltr;
+
+        /* Support for all WebKit browsers. */
+        -webkit-font-smoothing: antialiased;
+        /* Support for Safari and Chrome. */
+        text-rendering: optimizeLegibility;
+
+        /* Support for Firefox. */
+        -moz-osx-font-smoothing: grayscale;
+
+        /* Support for IE. */
+        font-feature-settings: 'liga';
+    }
+    .material-icons.md-18 { font-size: 18px; }
+    .material-icons.md-24 { font-size: 24px; }
+    .material-icons.md-36 { font-size: 36px; }
+    .material-icons.md-48 { font-size: 48px; }
+</style>
+</html>
