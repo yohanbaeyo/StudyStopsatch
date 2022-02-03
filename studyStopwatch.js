@@ -145,6 +145,7 @@ class StopwatchController {
     resetStopwatch() {
         this.initializeStopwatch()
         clearInterval(this.stopwatch)
+        clearInterval(this.pausingStopwatch)
         this.updateTime()
 
 
