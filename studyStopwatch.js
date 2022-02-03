@@ -50,26 +50,31 @@ class StopwatchController {
         this.isStopwatchWorking = false
         this.isStopwatchReseted = true
         this.timeIndicator = null;
-        this.pausedTime = 0;
+        this.pausingStopwatchTimeIndicator = null
+        // this.pausedTime = 0;
         this.pauseStartedTime = null;
         this.stopwatch = null;
+        this.pausingStopwatch = null;
         this.startTime = null;
         this.studyRecord = [];
         this.resumeStartedTime = null;
+        this.studyTime = 0
     }
 
     initializeStopwatch() {
         this.isStopwatchReseted = true
         this.startTime = new Date()
-        this.pausedTime = 0
+        // this.pausedTime = 0
+        this.studyTime = 0
         this.resumeStartedTime = null
         this.isStopwatchWorking = false;
         this.timeIndicator = document.querySelector("#time-indicator")
+        this.pausingStopwatchTimeIndicator = document.querySelector("#pausing-time-indicator")
         // console.log(this.startTime)
         // setInterval(()=>{console.log(this.timeIndicator)}, 1000)
     }
 
-    extractCSV() {
+    extractCSV(alertReset=true) {
         let csv = ""
         csv += `action,when,time pausing,time studying,memo\r\n`
         this.studyRecord.forEach((it) => {
@@ -104,19 +109,28 @@ class StopwatchController {
         downloadLink.click()
         document.body.removeChild(downloadLink)
 
-        let ans = confirm("공부를 이어하되 지금까지의 기록을 지우고 덮어쓰시겠습니까?")
-        if(ans) {
+        let skipAlert = document.querySelector("#skip-alert").getAttribute("checked")
+        if(skipAlert) {
             this.studyRecord = []
+            return
+        }
+
+        if(alertReset) {
+            let ans = confirm("공부를 이어하되 지금까지의 기록을 지우고 덮어쓰시겠습니까?")
+            if(ans) {
+                this.studyRecord = []
+            }
         }
     }
 
     addRecord() {
-        console.log("addRecord")
+        // console.log("addRecord")
+        this.studyTime += new Date() - this.resumeStartedTime
 
         let ans = prompt("어떤 이유로 기록하시겠습니까?")
         this.studyRecord.push(new Info("record", new Date(), new Date() - this.resumeStartedTime, ans))
         this.resumeStartedTime = new Date()
-        console.log(this.studyRecord)
+        // console.log(this.studyRecord)
     }
 
     recordOrDownload() {
@@ -133,29 +147,46 @@ class StopwatchController {
         clearInterval(this.stopwatch)
         this.updateTime()
 
-        let ans = confirm("미리 공부 기록을 백업해둘까요?")
-        if(ans) {
+
+        let skipAlert = document.querySelector("#skip-alert").getAttribute("checked")
+
+        if(skipAlert) {
             this.extractCSV()
+        } else {
+            let ans = confirm("미리 공부 기록을 백업해둘까요?")
+            if(ans) {
+                this.extractCSV(false)
+            }
+            this.studyRecord = []
         }
-        this.studyRecord = []
+
+        document.querySelector("#stop-pause").children[0].setAttribute("type", "play_arrow")
+        document.querySelector("#record-download").children[0].setAttribute("type", "download")
 
         document.querySelectorAll('.change-when-paused').forEach((elem, _) => {
                 elem.classList.remove("pausing")
             }
         )
     }
-
-
-    updateTime() {
-        // console.log(this.pausedTime)
-        let deltaTime = (new Date() - this.startTime - this.pausedTime)
+    millisecondsToTimeString(deltaTime) {
         let seconds = Math.floor(deltaTime / 1000)
         let hour = Math.floor((seconds/ 3600))
         let min = Math.floor((seconds % 3600) / 60)
         let deciseconds = Math.floor((deltaTime - seconds * 1000) / 100)
         seconds %= 60
+        return `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${deciseconds}`
+    }
+
+    updateTime() {
+        // console.log(this.pausedTime)
+        let deltaTime = (new Date() - this.resumeStartedTime + this.studyTime)
         // let timeString = "" + (time/3600/1000) + ":" + (time/3600)
-        this.timeIndicator.textContent = `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${deciseconds}`
+        this.timeIndicator.textContent = this.millisecondsToTimeString(deltaTime)
+    }
+
+    updatePausingTime() {
+        let deltaTime = (new Date() - this.pauseStartedTime)
+        this.pausingStopwatchTimeIndicator.textContent = this.millisecondsToTimeString(deltaTime)
     }
 
     toggleStopwatch(event) {
@@ -165,11 +196,18 @@ class StopwatchController {
         // event.target.childNodes[0].childNodes[0].textContent = "pause"
         if(this.isStopwatchWorking) {
             clearInterval(this.stopwatch)
+            this.pausingStopwatchTimeIndicator.textContent = "00:00:00.0"
+            this.studyTime += new Date() - this.resumeStartedTime
+
             setTimeout(()=> {
-                let ans = prompt("왜 타이머를 중지하나요?", "")
-                console.log(ans)
+                let ans = prompt("왜 타이머를 중지하나요?")
+                // console.log(ans)
                 this.pauseStartedTime = new Date()
                 this.studyRecord.push(new Info("pause", this.pauseStartedTime, this.pauseStartedTime - this.resumeStartedTime, ans))
+                this.pausingStopwatch = setInterval(()=>{
+                    this.updatePausingTime()
+                }, 1000/50)
+
             }, 400)
             document.querySelector("#stop-pause").children[0].setAttribute("type", "play_arrow")
             document.querySelector("#record-download").children[0].setAttribute("type", "download")
@@ -178,6 +216,8 @@ class StopwatchController {
                 }
             )
         } else {
+            clearInterval(this.pausingStopwatch)
+
             document.querySelector("#stop-pause").children[0].setAttribute("type", "pause")
             document.querySelector("#record-download").children[0].setAttribute("type", "history")
 
@@ -190,11 +230,11 @@ class StopwatchController {
                 this.isStopwatchReseted = false
                 this.studyRecord.push(new Info("begin", new Date(), 0))
             } else {
-                this.resumeStartedTime = new Date()
-                this.pausedTime += new Date() - this.pauseStartedTime
-                let ans = prompt("타이머를 중지한 동안 무엇을 하셨나요?", "")
+                let ans = prompt("타이머를 중지한 동안 무엇을 하셨나요?")
                 this.studyRecord.push(new Info("resume", new Date(), new Date() - this.pauseStartedTime, ans))
+                // this.pausedTime += new Date() - this.pauseStartedTime
             }
+            this.resumeStartedTime = new Date()
             this.stopwatch = setInterval(()=>{
                 this.updateTime()
             }, 1000/50)
@@ -213,6 +253,5 @@ let stopwatchController = new StopwatchController()
 
 window.customElements.define('icon-tag', Icon)
 // stopwatchController.initializeStopwatch()
-window.addEventListener('load', ()=> {stopwatchController.initializeStopwatch(); console.log(stopwatchController)})
+window.addEventListener('load', ()=> {stopwatchController.initializeStopwatch();})
 // setInterval(()=>{console.log(stopwatchController)}, 100)
-

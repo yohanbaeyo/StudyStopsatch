@@ -18,21 +18,27 @@
                 return false;
             }
         }
+        window.onbeforeunload = ()=>{return "창을 닫으시겠습니까?";};
 */
-        // window.onbeforeunload = ()=>{return "창을 닫으시겠습니까?";};
     </script>
 </head>
 <body>
-    <div class="stop-watch">
-        <div class="pausing-stopwatch change-when-paused"></div>
-        <div class="stopwatch-title-container">
-            <span id="time-indicator" class="change-when-paused">00:00:00.0</span>
+    <div style="display: flex; flex-direction: column; align-items: end">
+        <div class="pausing-stopwatch change-when-paused"><span id="pausing-time-indicator">00:00:00.0</span></div>
+        <div class="stop-watch">
+            <!-- TODO : pausing 후에는 다른 스톱워치가 작동하게 -->
+            <div class="stopwatch-title-container">
+                <span id="time-indicator" class="change-when-paused">00:00:00.0</span>
+            </div>
+            <button id="stop-pause" class="button change-when-paused" onclick="stopwatchController.toggleStopwatch(event)"><icon-tag size="24" type="play_arrow"></icon-tag></button>
+            <button id="reset" class="button change-when-paused" onclick="stopwatchController.resetStopwatch()"><icon-tag size="24" type="replay"></icon-tag></button>
+            <button id="record-download" class="button change-when-paused" onclick="stopwatchController.recordOrDownload()" ><icon-tag size="24" type="download"></icon-tag></button>
+            <div id="checkbox-container">
+                <label for="skip-alert">알림창 스킵</label>
+                <input id="skip-alert" type="checkbox" checked="checked"/>
+            </div>
         </div>
-        <button id="stop-pause" class="button change-when-paused" onclick="stopwatchController.toggleStopwatch(event)"><icon-tag size="24" type="play_arrow"></icon-tag></button>
-        <button id="reset" class="button change-when-paused" onclick="stopwatchController.resetStopwatch()"><icon-tag size="24" type="replay"></icon-tag></button>
-        <button id="record-download" class="button change-when-paused" onclick="stopwatchController.recordOrDownload()" ><icon-tag size="24" type="download"></icon-tag></button>
     </div>
-<!--TODO : 경고창 자동 accept 체크박스-->
 </body>
 <style>
     .material-icons {
