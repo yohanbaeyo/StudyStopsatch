@@ -66,7 +66,7 @@ class StopwatchController {
         this.startTime = new Date()
         // this.pausedTime = 0
         this.studyTime = 0
-        this.resumeStartedTime = null
+        this.resumeStartedTime = new Date()
         this.isStopwatchWorking = false;
         this.timeIndicator = document.querySelector("#time-indicator")
         this.pausingStopwatchTimeIndicator = document.querySelector("#pausing-time-indicator")
@@ -109,7 +109,7 @@ class StopwatchController {
         downloadLink.click()
         document.body.removeChild(downloadLink)
 
-        let skipAlert = document.querySelector("#skip-alert").getAttribute("checked")
+        let skipAlert = document.querySelector("#skip-alert").checked
         if(skipAlert) {
             this.studyRecord = []
             return
@@ -148,7 +148,7 @@ class StopwatchController {
         this.updateTime()
 
 
-        let skipAlert = document.querySelector("#skip-alert").getAttribute("checked")
+        let skipAlert = document.querySelector("#skip-alert").checked
 
         if(skipAlert) {
             this.extractCSV()
