@@ -242,6 +242,18 @@ class StopwatchController {
         }
         this.isStopwatchWorking = !this.isStopwatchWorking
     }
+
+    handleVisibilityChange() {
+        if(document.hidden) {
+            if(this.isStopwatchWorking) {
+                this.toggleStopwatch()
+            }
+        } else {
+            if(!this.isStopwatchWorking) {
+                this.toggleStopwatch()
+            }
+        }
+    }
 }
 
 /*
@@ -256,3 +268,4 @@ window.customElements.define('icon-tag', Icon)
 // stopwatchController.initializeStopwatch()
 window.addEventListener('load', ()=> {stopwatchController.initializeStopwatch();})
 // setInterval(()=>{console.log(stopwatchController)}, 100)
+window.addEventListener("visibilitychange", ()=>{stopwatchController.handleVisibilityChange()}, false)
