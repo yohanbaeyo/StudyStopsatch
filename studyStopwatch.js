@@ -190,7 +190,7 @@ class StopwatchController {
         this.pausingStopwatchTimeIndicator.textContent = this.millisecondsToTimeString(deltaTime)
     }
 
-    toggleStopwatch(event) {
+    toggleStopwatch(event, ask=true) {
         // console.log(this.isStopwatchWorking)
         // console.log(this.timeIndicator)
         // console.log(this.startTime)
@@ -201,10 +201,15 @@ class StopwatchController {
             this.studyTime += new Date() - this.resumeStartedTime
 
             setTimeout(()=> {
-                let ans = prompt("왜 타이머를 중지하나요?")
-                // console.log(ans)
-                this.pauseStartedTime = new Date()
-                this.studyRecord.push(new Info("pause", this.pauseStartedTime, this.pauseStartedTime - this.resumeStartedTime, ans))
+                if(ask) {
+                    let ans = prompt("왜 타이머를 중지하나요?")
+                    // console.log(ans)
+                    this.pauseStartedTime = new Date()
+                    this.studyRecord.push(new Info("pause", this.pauseStartedTime, this.pauseStartedTime - this.resumeStartedTime, ans))
+                } else {
+                    this.pauseStartedTime = new Date()
+                    this.studyRecord.push(new Info("pause", this.pauseStartedTime, this.pauseStartedTime - this.resumeStartedTime, "스톱워치 이탈"))
+                }
                 this.pausingStopwatch = setInterval(()=>{
                     this.updatePausingTime()
                 }, 1000/50)
@@ -230,10 +235,12 @@ class StopwatchController {
                 this.resumeStartedTime = (this.startTime = new Date())
                 this.isStopwatchReseted = false
                 this.studyRecord.push(new Info("begin", new Date(), 0))
-            } else {
+            } else if(ask) {
                 let ans = prompt("타이머를 중지한 동안 무엇을 하셨나요?")
                 this.studyRecord.push(new Info("resume", new Date(), new Date() - this.pauseStartedTime, ans))
                 // this.pausedTime += new Date() - this.pauseStartedTime
+            } else {
+                this.studyRecord.push(new Info("resume", new Date(), new Date() - this.pauseStartedTime, "스톱워치 이탈"))
             }
             this.resumeStartedTime = new Date()
             this.stopwatch = setInterval(()=>{
