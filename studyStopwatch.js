@@ -250,14 +250,14 @@ class StopwatchController {
         this.isStopwatchWorking = !this.isStopwatchWorking
     }
 
-    handleVisibilityChange() {
+    handleVisibilityChange(event) {
         if(document.hidden) {
             if(this.isStopwatchWorking) {
-                this.toggleStopwatch()
+                this.toggleStopwatch(event, false)
             }
         } else {
             if(!this.isStopwatchWorking) {
-                this.toggleStopwatch()
+                this.toggleStopwatch(event, false)
             }
         }
     }
